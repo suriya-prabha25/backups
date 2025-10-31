@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arcadian Flats - Interactive Tour</title>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #2c3e50;
+      --secondary-color: #3498db;
+      --accent-color: #e74c3c;
+      --light-color: #ecf0f1;
+      --dark-color: #2c3e50;
+      --success-color: #2ecc71;
+      --warning-color: #f39c12;
+      --info-color: #3498db;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      color: var(--dark-color);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    .header {
+      background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+      color: white;
+      padding: 1rem 0;
+      box-shadow: var(--shadow);
+      position: relative;
+      z-index: 100;
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 1rem;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo i {
+      font-size: 1.8rem;
+      color: var(--light-color);
+    }
+
+    .logo h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .back-btn {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: var(--transition);
+      font-weight: 500;
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .container-flex {
+      display: flex;
+      min-height: calc(100vh - 80px);
+      flex-direction: column;
+    }
+
+    @media (min-width: 992px) {
+      .container-flex {
+        flex-direction: row;
+      }
+    }
+
+    .sidebar {
+      width: 100%;
+      background: white;
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      z-index: 10;
+    }
+
+    @media (min-width: 992px) {
+      .sidebar {
+        width: 280px;
+        height: calc(100vh - 80px);
+        overflow-y: auto;
+      }
+    }
+
+    .sidebar h3 {
+      color: var(--primary-color);
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--secondary-color);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sidebar h3 i {
+      color: var(--secondary-color);
+    }
+
+    .unit-btn {
+      width: 100%;
+      margin-bottom: 0.75rem;
+      background: white;
+      color: var(--dark-color);
+      border: 1px solid #ddd;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      transition: var(--transition);
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .unit-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-color: var(--secondary-color);
+    }
+
+    .unit-btn.active {
+      background: var(--secondary-color);
+      color: white;
+      border-color: var(--secondary-color);
+    }
+
+    .unit-info {
+      font-size: 0.85rem;
+      opacity: 0.8;
+    }
+
+    .main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 1rem;
+    }
+
+    .svg-container {
+      width: 100%;
+      max-width: 1200px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      padding: 1rem;
+      overflow: hidden;
+    }
+
+    svg {
+      width: 100%;
+      height: auto;
+      max-height: 80vh;
+      border-radius: 8px;
+    }
+
+    polygon {
+      cursor: pointer;
+      transition: var(--transition);
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    }
+
+    polygon:hover {
+      opacity: 0.9;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 1000;
+    }
+
+    .modal-backdrop.show {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .modal-content {
+      position: relative;
+      max-width: 90%;
+      max-height: 90%;
+    }
+
+    .modal-content img {
+      max-height: 90vh;
+      max-width: 90vw;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background-color: rgba(0, 0, 0, 0.6);
+      border: none;
+      color: white;
+      font-size: 22px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .close-btn:hover {
+      background-color: rgba(0, 0, 0, 0.9);
+      transform: scale(1.1);
+    }
+
+    .info-panel {
+      background: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .info-panel h4 {
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .info-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+    }
+
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 0.75rem;
+      background: var(--light-color);
+      border-radius: 8px;
+    }
+
+    .detail-item i {
+      font-size: 1.5rem;
+      color: var(--secondary-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .detail-value {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--primary-color);
+    }
+
+    .detail-label {
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .action-btn {
+      flex: 1;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .action-btn.primary {
+      background: var(--secondary-color);
+      color: white;
+    }
+
+    .action-btn.secondary {
+      background: var(--light-color);
+      color: var(--dark-color);
+    }
+
+    .action-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .footer {
+      background: var(--primary-color);
+      color: white;
+      text-align: center;
+      padding: 1rem;
+      margin-top: auto;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .header-content {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+      
+      .logo h1 {
+        font-size: 1.3rem;
+      }
+      
+      .info-details {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .sidebar {
+        padding: 1rem;
+      }
+      
+      .svg-container {
+        padding: 0.5rem;
+      }
+      
+      .info-details {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <i class="fas fa-building"></i>
+          <h1>Arcadian Flats</h1>
+        </div>
+        <a href="index2.html" class="back-btn">
+          <i class="fas fa-arrow-left"></i> Back
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="container-flex">
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+      <h3><i class="fas fa-map-marker-alt"></i> Available Units</h3>
+      <button class="unit-btn" onclick="selectUnit(1)">
+        <div>
+          <strong>Unit No. 1</strong>
+          <div class="unit-info">3 BHK, 1400 sq.ft</div>
+        </div>
+        <i class="fas fa-chevron-right"></i>
+      </button>
+      <button class="unit-btn" onclick="selectUnit(2)">
+        <div>
+          <strong>Unit No. 2</strong>
+          <div class="unit-info">3 BHK, 1400 sq.ft</div>
+        </div>
+        <i class="fas fa-chevron-right"></i>
+      </button>
+      <button class="unit-btn" onclick="selectUnit(3)">
+        <div>
+          <strong>Unit No. 3</strong>
+          <div class="unit-info">2 BHK, 1200 sq.ft</div>
+        </div>
+        <i class="fas fa-chevron-right"></i>
+      </button>
+      <button class="unit-btn" onclick="selectUnit(4)">
+        <div>
+          <strong>Unit No. 4</strong>
+          <div class="unit-info">1 BHK, 1000 sq.ft</div>
+        </div>
+        <i class="fas fa-chevron-right"></i>
+      </button>
+
+      <!-- Info Panel -->
+      <div class="info-panel">
+        <h4><i class="fas fa-info-circle"></i> Unit Details</h4>
+        <div class="info-details">
+          <div class="detail-item">
+            <i class="fas fa-bed"></i>
+            <div class="detail-value" id="bedrooms">-</div>
+            <div class="detail-label">Bedrooms</div>
+          </div>
+          <div class="detail-item">
+            <i class="fas fa-bath"></i>
+            <div class="detail-value" id="bathrooms">-</div>
+            <div class="detail-label">Bathrooms</div>
+          </div>
+          <div class="detail-item">
+            <i class="fas fa-ruler-combined"></i>
+            <div class="detail-value" id="area">-</div>
+            <div class="detail-label">Area</div>
+          </div>
+          <div class="detail-item">
+            <i class="fas fa-dollar-sign"></i>
+            <div class="detail-value" id="price">-</div>
+            <div class="detail-label">Price</div>
+          </div>
+        </div>
+        
+        <div class="action-buttons">
+          <button class="action-btn primary" onclick="openZoom()">
+            <i class="fas fa-expand"></i> Zoom Image
+          </button>
+          <!-- <button class="action-btn secondary" onclick="scheduleTour()">
+            <i class="fas fa-calendar-alt"></i> Schedule Tour
+          </button> -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Main SVG Area -->
+    <div class="main">
+      <div class="svg-container">
+        <svg viewBox="0 0 3000 2000" preserveAspectRatio="xMidYMid meet">
+          <image href="img/arcadianew.jpg" width="3000" height="2000" />
+          
+          <a href="room_view.html">
+          <polygon
+            id="unit1"
+            transform="translate(0,155)"
+            points="185,290,92,529,148,529,79,706,121,719,124,754,191,754,190,714,257,711,256,738,325,738,331,709,524,709,572,534,820,537,1004,533,1001,629,1133,631,1138,558,1258,554,1356,554,1501,554,1496,385,1499,419,1427,419,1430,384,1385,382,1385,324,1345,324,1340,361,1207,364,1207,321,1168,321,1170,287,1091,284,829,281,823,297,728,294,726,334,649,332,659,263,604,260,596,292,463,297,463,266,413,263,252,266,236,295"
+            fill="transparent"
+            stroke="rgba(52, 152, 219, 0.8)"
+            stroke-width="3"
+            onmouseover="hoverUnit(1)"
+            onmouseout="unhoverUnit(1)"
+            onclick="selectUnit(1)"
+          >
+            <title>Section 1 (3 BHK, 1400 sq.ft)</title>
+          </polygon>
+          </a>
+
+          <a href="room_view.html">
+          <polygon
+            id="unit2"
+            transform="translate(0,155)"
+            points="1501,381,1499,550,1745,550,1859,542,1872,627,2010,627,1996,529,2378,532,2415,699,2616,696,2624,741,2701,738,2701,704,2754,706,2756,744,2815,744,2815,709,2873,704,2804,532,2913,529,2823,285,2764,285,2759,264,2526,264,2531,296,2404,296,2394,259,2330,264,2341,328,2288,328,2280,293,2182,293,2179,272,1906,272,1906,298,1827,296,1819,328,1787,328,1787,359,1655,357,1655,328,1605,328,1599,381"
+            fill="transparent"
+            stroke="rgba(52, 152, 219, 0.8)"
+            stroke-width="3"
+            onmouseover="hoverUnit(2)"
+            onmouseout="unhoverUnit(2)"
+            onclick="selectUnit(2)"
+          >
+            <title>Section 2 (3 BHK, 1400 sq.ft)</title>
+          </polygon>
+          </a>
+
+          <a href="room_view.html">
+          <polygon
+            id="unit3"
+            transform="translate(0,155)"
+            points="217,1475,214,1475,320,1099,355,1099,368,1054,334,1051,355,985,564,987,569,1024,633,1017,633,977,680,974,702,977,712,932,686,929,707,850,712,815,1041,805,1030,897,1149,897,1139,1006,1501,1011,1501,1178,1448,1176,1446,1197,1403,1199,1403,1176,1374,1176,1374,1335,1329,1335,1327,1377,1154,1377,1160,1340,1117,1337,1109,1470,1035,1475,1035,1557,834,1560,839,1470,760,1470,752,1523,590,1523,596,1475,477,1478,469,1533,283,1539,294,1475"
+            fill="transparent"
+            stroke="rgba(52, 152, 219, 0.8)"
+            stroke-width="3"
+            onmouseover="hoverUnit(3)"
+            onmouseout="unhoverUnit(3)"
+            onclick="selectUnit(3)"
+          >
+            <title>Section 3 (2 BHK, 1200 sq.ft)</title>
+          </polygon>
+          </a>
+
+          <a href="room_view.html">
+          <polygon
+            id="unit4"
+            transform="translate(0,155)"
+            points="1496,1014,1581,1011,1867,1014,1848,850,1975,847,2296,850,2309,903,2304,934,2312,966,2362,969,2367,1006,2423,1006,2428,977,2645,977,2658,1019,2645,1046,2656,1088,2677,1083,2783,1478,2717,1475,2722,1536,2518,1536,2515,1496,2521,1472,2433,1472,2433,1515,2256,1517,2245,1480,2163,1478,2177,1562,1975,1565,1967,1478,1888,1478,1877,1348,1853,1345,1853,1377,1681,1374,1676,1335,1618,1337,1605,1244,1607,1279,1523,1279,1523,1247,1499,1247,1499,1197,1496,1101"
+            fill="transparent"
+            stroke="rgba(52, 152, 219, 0.8)"
+            stroke-width="3"
+            onmouseover="hoverUnit(4)"
+            onmouseout="unhoverUnit(4)"
+            onclick="selectUnit(4)"
+          >
+            <title>Section 4 (1 BHK, 1000 sq.ft)</title>
+          </polygon>
+          </a>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Zoom Modal -->
+  <div class="modal-backdrop" id="zoomModal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeZoom()">×</button>
+      <img src="img/arcadianew.jpg" alt="Zoomed Flat Layout" />
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2025 Arcadian Flats. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    const unitColors = {
+      1: "rgba(52, 152, 219, 0.5)",
+      2: "rgba(46, 204, 113, 0.5)",
+      3: "rgba(155, 89, 182, 0.5)",
+      4: "rgba(241, 196, 15, 0.5)",
+    };
+    
+    const unitDetails = {
+      1: { bedrooms: 3, bathrooms: 2, area: "1400 sq.ft", price: "$450,000" },
+      2: { bedrooms: 3, bathrooms: 2, area: "1400 sq.ft", price: "$450,000" },
+      3: { bedrooms: 2, bathrooms: 2, area: "1200 sq.ft", price: "$380,000" },
+      4: { bedrooms: 1, bathrooms: 1, area: "1000 sq.ft", price: "$320,000" }
+    };
+    
+    let selectedUnit = null;
+
+    function hoverUnit(id) {
+      const poly = document.getElementById("unit" + id);
+      if (selectedUnit !== id) {
+        poly.setAttribute("fill", unitColors[id]);
+        poly.setAttribute("stroke-width", "4");
+      }
+    }
+
+    function unhoverUnit(id) {
+      const poly = document.getElementById("unit" + id);
+      if (selectedUnit !== id) {
+        poly.setAttribute("fill", "transparent");
+        poly.setAttribute("stroke-width", "3");
+      }
+    }
+
+    function selectUnit(id) {
+      // Reset all buttons
+      document.querySelectorAll('.unit-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      // Reset all polygons
+      if (selectedUnit) {
+        document.getElementById("unit" + selectedUnit).setAttribute("fill", "transparent");
+        document.getElementById("unit" + selectedUnit).setAttribute("stroke-width", "3");
+      }
+      
+      // Set new selection
+      selectedUnit = id;
+      document.getElementById("unit" + id).setAttribute("fill", unitColors[id]);
+      document.getElementById("unit" + id).setAttribute("stroke-width", "4");
+      
+      // Highlight the button
+      document.querySelectorAll('.unit-btn')[id-1].classList.add('active');
+      
+      // Update info panel
+      updateInfoPanel(id);
+    }
+
+    function updateInfoPanel(id) {
+      const details = unitDetails[id];
+      document.getElementById('bedrooms').textContent = details.bedrooms;
+      document.getElementById('bathrooms').textContent = details.bathrooms;
+      document.getElementById('area').textContent = details.area;
+      document.getElementById('price').textContent = details.price;
+    }
+
+    function openZoom() {
+      document.getElementById("zoomModal").classList.add("show");
+    }
+
+    function closeZoom() {
+      document.getElementById("zoomModal").classList.remove("show");
+    }
+    
+    function scheduleTour() {
+      alert("Thank you for your interest! Our representative will contact you shortly to schedule a tour.");
+    }
+
+    // Initialize with first unit selected
+    document.addEventListener('DOMContentLoaded', function() {
+      selectUnit(1);
+    });
+  </script>
+</body>
+</html>
