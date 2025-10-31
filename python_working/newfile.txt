@@ -1,0 +1,3 @@
+Hello,i successfully created a new file.
+Hello i am a new and first content of this file.
+This is a appended message

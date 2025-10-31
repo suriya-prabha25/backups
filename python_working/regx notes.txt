@@ -1,0 +1,48 @@
+#start
+
+
+if we want to work with regular expression have to import re 
+import re
+
+RegEx Functions
+1. findall  => return a list containing all matches [1,'','values'],incase not matches return empty list containing [].
+2. search   => search the string for matches.there is more than one match only the first occurrence of the match will be returned,incase no match is found return None.
+3. split    => returns a list where the string split at each match;can control the max split using maxsplit in parameter.
+4. sub      => replace the matches \s Ex: Repalce every white space character with the number"9";can control the count in parameter,Ex:Repalce the first 2 occurences.
+5. match object => this is object containing information about search and the result,incase not matches return the value None.
+   * .span() = returns a tuple containing the start and end position of the match Ex:car (0,3).
+   * .string = return the entire string when the condition of search is satisfied Ex:this is a car.
+   * .group()= return the particular word on that string based on the consition is satisfied Ex:car.
+
+RegEx Metacharacters
+[] => a set of character "[a-m]"
+.  => followed by any character (except newline character) "he..o"
+^  => starts with (begining of the string) "^hello"
+
+$  => ends with (end of the string) "end$"
+*  => Search for a sequence that starts with "he", followed by 0 or more  (any) characters, and an "o" Ex:"he.*o"
++  => followed by one or more occurences Ex:"he.+o"
+?  => zero or one occurences Ex:"he.?o"
+{} => exactly the specified number of occurences Ex:"he.{2}o"
+|  => check if the string contains either "falls" or "stays" Ex:"falls|stays" 
+() => capture and group
+
+RegEx Special Sequences
+\A => begining of the string;check if the string starts with "The" same as ^
+\b => returns a match specified characters are at the begining Ex:r"\bain" ("r" in the begining/end that the string is begin treated as "raw string")
+      returns a match satisfied characters are at the end Ex:r"ain\b"
+\B => returns a match specified characters are present,but NOT at the begining Ex:r"\Bain"
+      returns a match specified characters are present,but NOT at the end Ex:r"ain\B"
+\d => returns a match where the string contains digits (numbers from 0-9) "\d"
+\D => returns a match where the string DOES NOT contain digits  "\D"
+\s => returns a match where the string contains a white space character  "\s"
+\S => returns a match where the string DOES NOT contain a white space character  "\S" ['T', 'h', 'e', 'r', 'a', 'i', 'n', 'i', 'n', 'S', 'p', 'a', 'i', 'n'] print only characters ommit spaces on the string
+\w => returns a match where the string contains any word characters (characters from a to Z, digits from 0-9, and the underscore _ character) "\w"
+\W => returns a match where the string DOES NOT contain any word characters  "\W"
+\Z => returns a match if the specified characters are at the end of the string "Spain\Z" same as $
+
+
+#completed
+
+lowercase with underscore => "^[a-z]+_[a-z]+$"
+to get whole word in the string => "\w*z\w*"
